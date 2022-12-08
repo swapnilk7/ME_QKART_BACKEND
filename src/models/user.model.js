@@ -12,6 +12,15 @@ const userSchema = mongoose.Schema(
       trim: true,
     },
     email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Email not entered in correct format");
+        }
+      },
     },
     password: {
       type: String,
@@ -24,6 +33,9 @@ const userSchema = mongoose.Schema(
       },
     },
     walletMoney: {
+      type: Number,
+      required: true,
+      default: config.default_wallet_money,
     },
     address: {
       type: String,
@@ -43,9 +55,24 @@ const userSchema = mongoose.Schema(
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
+  // const user = this.findOne({ email: new RegExp(email, "i") });
+  // return user;
+  // return new Promise((resolve, reject) => {
+  //   this.findOne({ email: new RegExp(email, "i") }, (error, user) => {
+  //     if (error) {
+  //       return reject(error);
+  //     }
+  //     resolve(user);
+  //   });
+  // });
+  return this.findOne({ email: new RegExp(email, "i") }, function (err, docs) {
+    if (err) {
+      return false;
+    } else {
+      return true;
+    }
+  });
 };
-
-
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*
@@ -56,3 +83,6 @@ userSchema.statics.isEmailTaken = async function (email) {
 /**
  * @typedef User
  */
+const userModel = mongoose.model("User", userSchema);
+
+module.exports.User = userModel;

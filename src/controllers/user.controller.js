@@ -39,8 +39,18 @@ const { userService } = require("../services");
  *
  */
 const getUser = catchAsync(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await userService.getUserById(userId);
+    res.status(httpStatus.OK).json(result);
+  } catch (error) {
+    if (error && error.statusCode) {
+      res.status(error.statusCode).json({ error, message: error.message });
+    } else {
+      res.status(httpStatus.BAD_REQUEST);
+    }
+  }
 });
-
 
 module.exports = {
   getUser,
