@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const config = require("../config/config");
 
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -42,29 +41,17 @@ const userSchema = mongoose.Schema(
       default: config.default_address,
     },
   },
-  // Create createdAt and updatedAt fields automatically
   {
     timestamps: true,
   }
 );
 
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement the isEmailTaken() static method
 /**
  * Check if email is taken
  * @param {string} email - The user's email
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
-  // const user = this.findOne({ email: new RegExp(email, "i") });
-  // return user;
-  // return new Promise((resolve, reject) => {
-  //   this.findOne({ email: new RegExp(email, "i") }, (error, user) => {
-  //     if (error) {
-  //       return reject(error);
-  //     }
-  //     resolve(user);
-  //   });
-  // });
   return this.findOne({ email: new RegExp(email, "i") }, function (err, docs) {
     if (err) {
       return false;
