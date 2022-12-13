@@ -44,13 +44,15 @@ const { userService } = require("../services");
 const getUser = catchAsync(async (req, res) => {
   try {
     const { userId } = req.params;
+    if (req.user._id != userId)
+      throw new ApiError(httpStatus.FORBIDDEN, "Forbidden Request");
     const result = await userService.getUserById(userId);
     res.status(httpStatus.OK).json(result);
   } catch (error) {
     if (error && error.statusCode) {
       res.status(error.statusCode).json({ error, message: error.message });
     } else {
-      res.status(httpStatus.BAD_REQUEST);
+      res.status(httpStatus.BAD_REQUEST).json({ message: error.message });
     }
   }
 });

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 // NOTE - "validator" external library and not the custom middleware at src/middlewares/validate.js
 const validator = require("validator");
 const config = require("../config/config");
@@ -46,6 +47,13 @@ const userSchema = mongoose.Schema(
   }
 );
 
+userSchema.pre("save", function (next) {
+  const salt = bcrypt.genSaltSync(8);
+  const hashedPassword = bcrypt.hashSync(this.password, salt);
+  this.password = hashedPassword;
+  next();
+});
+
 /**
  * Check if email is taken
  * @param {string} email - The user's email
@@ -59,6 +67,10 @@ userSchema.statics.isEmailTaken = async function (email) {
       return true;
     }
   });
+};
+
+userSchema.statics.isPasswordMatch = async function (password, loginPassword) {
+  return bcrypt.compareSync(loginPassword, password);
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS

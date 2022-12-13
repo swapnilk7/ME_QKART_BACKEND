@@ -1,7 +1,6 @@
 const { User } = require("../models");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
-const bcrypt = require("bcryptjs");
 
 /**
  * Get User by id
@@ -31,10 +30,11 @@ const getUserById = async (id) => {
  */
 const getUserByEmail = async (email) => {
   try {
-    const result = User.findOne({ email });
+    const result = await User.findOne({ email }).exec();
+    if (!result) throw new Error("Invalid Email");
     return result;
   } catch (error) {
-    throw new Error(error);
+    throw new ApiError(httpStatus.UNAUTHORIZED, error.message);
   }
 };
 
@@ -64,16 +64,14 @@ const getUserByEmail = async (email) => {
 const createUser = async (user) => {
   try {
     const { name, email, password } = user;
-    const isTaken = await User.isEmailTaken(email);
-    if (isTaken) {
+    const isEmailTaken = await User.isEmailTaken(email);
+    if (isEmailTaken) {
       throw new Error("Email already taken");
     }
-    const salt = bcrypt.genSaltSync(8);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    const newUser = User.create({ name, email, password: hashedPassword });
+    const newUser = await User.create({ name, email, password });
     return newUser;
   } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+    throw new ApiError(httpStatus.OK, error.message);
   }
 };
 
