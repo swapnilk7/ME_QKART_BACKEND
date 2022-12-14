@@ -1,6 +1,7 @@
 const { User } = require("../models");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
+const bcrypt = require("bcryptjs");
 
 /**
  * Get User by id
@@ -61,18 +62,21 @@ const getUserByEmail = async (email) => {
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
 
-const createUser = async (user) => {
-  try {
-    const { name, email, password } = user;
-    const isEmailTaken = await User.isEmailTaken(email);
-    if (isEmailTaken) {
-      throw new Error("Email already taken");
-    }
-    const newUser = await User.create({ name, email, password });
-    return newUser;
-  } catch (error) {
-    throw new ApiError(httpStatus.OK, error.message);
+const createUser = async (body) => {
+  const isEmailTaken = await User.isEmailTaken(body.email);
+  if (isEmailTaken) {
+    throw new ApiError(httpStatus.OK, "Email already taken");
+  } else {
+    const hashedPassword = await encryptPassword(body.password);
+    const newDoc = await User.create({ ...body, password: hashedPassword });
+    return newDoc;
   }
+};
+
+const encryptPassword = async (password) => {
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
 };
 
 module.exports = { getUserById, getUserByEmail, createUser };

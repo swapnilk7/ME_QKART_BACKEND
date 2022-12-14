@@ -1,7 +1,6 @@
 const httpStatus = require("http-status");
 const userService = require("./user.service");
 const ApiError = require("../utils/ApiError");
-const { User } = require("../models");
 
 /**
  * Login with username and password
@@ -16,14 +15,13 @@ const { User } = require("../models");
  * @returns {Promise<User>}
  */
 const loginUserWithEmailAndPassword = async (email, password) => {
-  try {
-    const user = await userService.getUserByEmail(email);
-    const comparePassword = await User.isPasswordMatch(user.password, password);
-    if (!comparePassword) throw new Error("Password is wrong");
-    return user;
-  } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, error.message);
-  }
+  const user = await userService.getUserByEmail(email);
+  if (!user)
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+  const comparePassword = await user.isPasswordMatch(password);
+  if (!comparePassword)
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+  return user;
 };
 
 module.exports = {

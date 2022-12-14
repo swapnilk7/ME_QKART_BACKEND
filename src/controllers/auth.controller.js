@@ -31,18 +31,23 @@ const { authService, userService, tokenService } = require("../services");
  *}
  *
  */
+// const register = catchAsync(async (req, res) => {
+//   try {
+//     const user = await userService.createUser(req.body);
+//     const tokens = await tokenService.generateAuthTokens(user);
+//     res.status(201).json({ user, tokens });
+//   } catch (error) {
+//     if (error && error.statusCode) {
+//       res.status(error.statusCode).json({ message: error.message });
+//     } else {
+//       res.status(httpStatus.BAD_REQUEST).json({ message: error.message });
+//     }
+//   }
+// });
 const register = catchAsync(async (req, res) => {
-  try {
-    const user = await userService.createUser(req.body);
-    const tokens = await tokenService.generateAuthTokens(user);
-    res.status(201).json({ user, tokens });
-  } catch (error) {
-    if (error && error.statusCode) {
-      res.status(error.statusCode).json({ message: error.message });
-    } else {
-      res.status(httpStatus.BAD_REQUEST).json({ message: error.message });
-    }
-  }
+  const user = await userService.createUser(req.body);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.status(201).json({ user, tokens });
 });
 
 /**
@@ -74,24 +79,30 @@ const register = catchAsync(async (req, res) => {
  *}
  *
  */
+// const login = catchAsync(async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await authService.loginUserWithEmailAndPassword(
+//       email,
+//       password
+//     );
+//     const tokens = await tokenService.generateAuthTokens(user);
+//     res.status(httpStatus.OK).json({ user, tokens });
+//   } catch (error) {
+//     if (error && error.statusCode) {
+//       res
+//         .status(error.statusCode)
+//         .json({ code: error.statusCode, message: error.message });
+//     } else {
+//       res.status(httpStatus.BAD_REQUEST).json({ message: error.message });
+//     }
+//   }
+// });
 const login = catchAsync(async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await authService.loginUserWithEmailAndPassword(
-      email,
-      password
-    );
-    const tokens = await tokenService.generateAuthTokens(user);
-    res.status(httpStatus.OK).json({ user, tokens });
-  } catch (error) {
-    if (error && error.statusCode) {
-      res
-        .status(error.statusCode)
-        .json({ code: error.statusCode, message: error.message });
-    } else {
-      res.status(httpStatus.BAD_REQUEST).json({ message: error.message });
-    }
-  }
+  const { email, password } = req.body;
+  const user = await authService.loginUserWithEmailAndPassword(email, password);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.status(httpStatus.OK).json({ user, tokens });
 });
 
 module.exports = {

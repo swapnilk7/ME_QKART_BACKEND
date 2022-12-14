@@ -47,30 +47,21 @@ const userSchema = mongoose.Schema(
   }
 );
 
-userSchema.pre("save", function (next) {
-  const salt = bcrypt.genSaltSync(8);
-  const hashedPassword = bcrypt.hashSync(this.password, salt);
-  this.password = hashedPassword;
-  next();
-});
-
 /**
  * Check if email is taken
  * @param {string} email - The user's email
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
-  return this.findOne({ email: new RegExp(email, "i") }, function (err, docs) {
-    if (err) {
-      return false;
-    } else {
-      return true;
-    }
+  const data = await this.find({
+    email: email,
   });
+  return data.length > 0;
 };
 
-userSchema.statics.isPasswordMatch = async function (password, loginPassword) {
-  return bcrypt.compareSync(loginPassword, password);
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return await bcrypt.compare(password, user.password);
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
