@@ -49,6 +49,7 @@ const getCartByUser = async (user) => {
  */
 const addProductToCart = async (user, productId, quantity) => {
   let cart = await Cart.findOne({ email: user.email });
+  const product = await getProductById(productId);
   if (!cart) {
     cart = await Cart.create({
       email: user.email,
@@ -60,18 +61,20 @@ const addProductToCart = async (user, productId, quantity) => {
         httpStatus.INTERNAL_SERVER_ERROR,
         "Cart creation Failed"
       );
+    cart.cartItems.push({ product: product, quantity: quantity });
+    await cart.save();
+    return cart;
+  }
 
-    let productIndex = getProductIndex(cart, productId);
+  let productIndex = getProductIndex(cart, productId);
 
-    if (productIndex === -1) {
-      const product = await getProductById(productId);
-      cart.cartItems.push({ product: product, quantity: quantity });
-    } else {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        "Product already in cart. Use the cart sidebar to update or remove product from cart"
-      );
-    }
+  if (productIndex === -1) {
+    cart.cartItems.push({ product: product, quantity: quantity });
+  } else {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Product already in cart. Use the cart sidebar to update or remove product from cart"
+    );
   }
 
   await cart.save();
@@ -104,13 +107,12 @@ const addProductToCart = async (user, productId, quantity) => {
  */
 const updateProductInCart = async (user, productId, quantity) => {
   let cart = await Cart.findOne({ email: user.email });
+  await getProductById(productId);
   if (!cart)
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       "User does not have a cart. Use POST to create cart and add a product"
     );
-
-  let product = await getProductById(productId);
 
   let productIndex = getProductIndex(cart, productId);
   if (productIndex === -1) {
@@ -135,7 +137,7 @@ const getProductById = async (id) => {
 
 const getProductIndex = (cart, productId) => {
   for (let i = 0; i < cart.cartItems.length; i++) {
-    if (productId === cart.cartItems[i].product._id) {
+    if (productId.toString() === cart.cartItems[i].product._id.toString()) {
       return i;
     }
   }
@@ -170,6 +172,7 @@ const deleteProductFromCart = async (user, productId) => {
     cart.cartItems.splice(productIndex, 1);
   }
   await cart.save();
+  return cart;
 };
 
 module.exports = {

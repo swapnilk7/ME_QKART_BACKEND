@@ -47,7 +47,6 @@ const addProductToCart = catchAsync(async (req, res) => {
     req.body.productId,
     req.body.quantity
   );
-
   res.status(httpStatus.CREATED).send(cart);
 });
 
@@ -70,8 +69,8 @@ const addProductToCart = catchAsync(async (req, res) => {
 const updateProductInCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
   if (quantity === 0) {
-    await cartService.deleteProductFromCart(req.user, productId);
-    return res.status(httpStatus.NO_CONTENT).send();
+    const cart = await cartService.deleteProductFromCart(req.user, productId);
+    return res.status(httpStatus.NO_CONTENT).send(cart);
   } else if (quantity > 0) {
     const updatedCart = await cartService.updateProductInCart(
       req.user,

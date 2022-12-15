@@ -60,7 +60,10 @@ const getUser = catchAsync(async (req, res) => {
 
   if (user) {
     if (user.email !== req.user.email) {
-      throw new ApiError(httpStatus.FORBIDDEN, "Forbidden Request");
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        "Forbidden Request : Not Authorized"
+      );
     } else {
       if (req.query.q === "address") {
         res.status(httpStatus.OK).json({ address: user.address });
