@@ -13,12 +13,11 @@ const ApiError = require("../utils/ApiError");
  * --- resolve the promise
  */
 const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
-  if (!user) {
+  if (!user || info || err)
     reject(new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate"));
-  } else {
-    req.user = user;
-    resolve();
-  }
+
+  req.user = user;
+  resolve();
 };
 
 /**

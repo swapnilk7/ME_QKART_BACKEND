@@ -51,18 +51,25 @@ const { userService } = require("../services");
  *
  */
 const getUser = catchAsync(async (req, res) => {
-  try {
-    const { userId } = req.params;
-    if (req.user._id != userId)
+  let user;
+  if (req.query.q === "address") {
+    user = await userService.getUserAddressById(req.params.userId);
+  } else {
+    user = await userService.getUserById(req.params.userId);
+  }
+
+  if (user) {
+    if (user.email !== req.user.email) {
       throw new ApiError(httpStatus.FORBIDDEN, "Forbidden Request");
-    const result = await userService.getUserById(userId);
-    res.status(httpStatus.OK).json(result);
-  } catch (error) {
-    if (error && error.statusCode) {
-      res.status(error.statusCode).json({ error, message: error.message });
     } else {
-      res.status(httpStatus.BAD_REQUEST).json({ message: error.message });
+      if (req.query.q === "address") {
+        res.status(httpStatus.OK).json({ address: user.address });
+      } else {
+        res.status(httpStatus.OK).json(user);
+      }
     }
+  } else {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
 });
 

@@ -10,16 +10,7 @@ const bcrypt = require("bcryptjs");
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  try {
-    const userResult = await User.findById(id);
-    if (userResult) {
-      return userResult;
-    } else {
-      throw new Error("User not found");
-    }
-  } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, error);
-  }
+  return User.findById(id);
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
@@ -30,13 +21,7 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  try {
-    const result = await User.findOne({ email }).exec();
-    if (!result) throw new Error("Invalid Email");
-    return result;
-  } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, error.message);
-  }
+  return User.findOne({ email }).exec();
 };
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
@@ -87,7 +72,9 @@ const encryptPassword = async (password) => {
  * @param {ObjectId} id
  * @returns {Promise<User>}
  */
-const getUserAddressById = async (id) => {};
+const getUserAddressById = async (id) => {
+  return User.findOne({ _id: id }, { email: 1, address: 1 });
+};
 
 /**
  * Set user's shipping address
@@ -101,4 +88,10 @@ const setAddress = async (user, newAddress) => {
   return user.address;
 };
 
-module.exports = { getUserById, getUserByEmail, createUser };
+module.exports = {
+  getUserById,
+  getUserByEmail,
+  createUser,
+  getUserAddressById,
+  setAddress,
+};
