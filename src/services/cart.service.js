@@ -3,8 +3,6 @@ const { Cart, Product } = require("../models");
 const ApiError = require("../utils/ApiError");
 const config = require("../config/config");
 
-// TODO: CRIO_TASK_MODULE_CART - Implement the Cart service methods
-
 /**
  * Fetches cart for a user
  * - Fetch user's cart from Mongo
@@ -175,9 +173,21 @@ const deleteProductFromCart = async (user, productId) => {
   return cart;
 };
 
+// TODO: CRIO_TASK_MODULE_TEST - Implement checkout function
+/**
+ * Checkout a users cart.
+ * On success, users cart must have no products.
+ *
+ * @param {User} user
+ * @returns {Promise}
+ * @throws {ApiError} when cart is invalid
+ */
+const checkout = async (user) => {};
+
 module.exports = {
   getCartByUser,
   addProductToCart,
   updateProductInCart,
   deleteProductFromCart,
+  checkout,
 };

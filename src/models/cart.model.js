@@ -18,6 +18,7 @@ const cartSchema = mongoose.Schema(
     timestamps: false,
   }
 );
+
 /**
  * @typedef Cart
  */
