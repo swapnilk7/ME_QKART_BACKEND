@@ -27,7 +27,10 @@ describe("Cart test", () => {
 
       const res = cartService.checkout(userOne);
 
+<<<<<<< HEAD
       // TODO: CRIO_TASK_MODULE_TEST - Assert if
+=======
+>>>>>>> 9da2bce53360eb0c9f75f6b49bf598d3f5009af6
       /* - ApiError is thrown
        * - the "statusCode" field of response is "404 NOT FOUND"
        *
